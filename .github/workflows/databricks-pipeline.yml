@@ -30,7 +30,7 @@ jobs:
           import json
           
           # Hardcoded values (NOT RECOMMENDED for TOKEN)
-          DATABRICKS_URL = 'https://adb-3961866957937656.16.azuredatabricks.net/browse?o=3961866957937656'
+          DATABRICKS_URL = 'https://adb-3961866957937656.16.azuredatabricks.net'
           TOKEN = 'dapiabe7e61c0da51195e8b6b11752dc5c9c'
           repo_id = '1290822242064119'
           new_branch_or_tag = 'main'
