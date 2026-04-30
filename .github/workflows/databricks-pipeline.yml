@@ -29,11 +29,11 @@ jobs:
           import requests
           import json
           
-          # Configuration - UPDATE THESE VALUES
+          # Configuration
           DATABRICKS_URL = 'https://adb-541623100598197.17.azuredatabricks.net'
           TOKEN = 'dapie5fdc595f8cfcf8e2ba5c5d01009b3cf'
-          GIT_REPO_URL = 'https://github.com/YOUR-ORG/YOUR-REPO.git'  # Your GitHub repo URL
-          DATABRICKS_REPO_PATH = '/Repos/danbalagan@barracuda.com/cicd-demo-repo'  # Path in Databricks
+          GIT_REPO_URL = 'https://github.com/nankasadaddi/ai-dev-days-demo-repo.git'
+          DATABRICKS_REPO_PATH = '/Repos/nankasadaddi@barracuda.com/ai-dev-days-demo-repo'
           BRANCH = 'main'
           
           headers = {
