@@ -23,31 +23,64 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
     
-      - name: Run Databricks Repo Update Script
+      - name: Sync Databricks Repo
         run: |
           python -c "
           import requests
           import json
           
-          # Hardcoded values (NOT RECOMMENDED for TOKEN)
-          DATABRICKS_URL = 'https://adb-3961866957937656.16.azuredatabricks.net'
+          # Configuration - UPDATE THESE VALUES
+          DATABRICKS_URL = 'https://adb-541623100598197.17.azuredatabricks.net'
           TOKEN = 'dapie5fdc595f8cfcf8e2ba5c5d01009b3cf'
-          repo_id = '1290822242064119'
-          new_branch_or_tag = 'main'
-          
-          endpoint = f'{DATABRICKS_URL}/api/2.0/repos/{repo_id}'
-          payload = {'branch': new_branch_or_tag}
+          GIT_REPO_URL = 'https://github.com/YOUR-ORG/YOUR-REPO.git'  # Your GitHub repo URL
+          DATABRICKS_REPO_PATH = '/Repos/danbalagan@barracuda.com/cicd-demo-repo'  # Path in Databricks
+          BRANCH = 'main'
           
           headers = {
               'Authorization': f'Bearer {TOKEN}',
               'Content-Type': 'application/json'
           }
           
-          response = requests.patch(endpoint, headers=headers, data=json.dumps(payload))
+          # Check if repo already exists
+          response = requests.get(f'{DATABRICKS_URL}/api/2.0/repos', headers=headers)
+          repos = response.json().get('repos', [])
           
-          if response.status_code == 200:
-              print('Repository updated successfully:', response.json())
+          existing_repo = None
+          for repo in repos:
+              if repo.get('path') == DATABRICKS_REPO_PATH:
+                  existing_repo = repo
+                  break
+          
+          if existing_repo:
+              # Repo exists - update to latest branch
+              repo_id = existing_repo['id']
+              print(f'Repo found with ID: {repo_id}. Updating to branch: {BRANCH}')
+              
+              response = requests.patch(
+                  f'{DATABRICKS_URL}/api/2.0/repos/{repo_id}',
+                  headers=headers,
+                  data=json.dumps({'branch': BRANCH})
+              )
           else:
-              print(f'Failed to update repo: {response.status_code} - {response.text}')
+              # Repo doesn't exist - create it
+              print(f'Repo not found. Creating new repo at: {DATABRICKS_REPO_PATH}')
+              
+              payload = {
+                  'url': GIT_REPO_URL,
+                  'provider': 'gitHub',
+                  'path': DATABRICKS_REPO_PATH
+              }
+              
+              response = requests.post(
+                  f'{DATABRICKS_URL}/api/2.0/repos',
+                  headers=headers,
+                  data=json.dumps(payload)
+              )
+          
+          # Check result
+          if response.status_code == 200:
+              print('Success:', response.json())
+          else:
+              print(f'Failed: {response.status_code} - {response.text}')
               exit(1)
           "
